@@ -1,0 +1,147 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login" text="" icon="chevron-back" color="dark"></ion-back-button>
+    </ion-buttons>
+    <ion-title></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="register-container">
+    <div class="header-text">
+      <h1>Create Account</h1>
+      <p>Join us to ensure your safety on the road.</p>
+    </div>
+
+    <form (ngSubmit)="onRegister()">
+
+      <!-- Stepper visuals could go here but let's keep it clean vertical form for now -->
+
+      <div class="form-section">
+        <h3 class="section-label">PERSONAL DETAILS</h3>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="user.name" name="name" placeholder="Full Name"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="call-outline" slot="start"></ion-icon>
+          <ion-input type="tel" [(ngModel)]="user.phone" name="phone" placeholder="Phone Number"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-input type="password" [(ngModel)]="user.password" name="password" placeholder="Password"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-label">DEVICE CONFIGURATION</h3>
+
+        <div class="info-card">
+          <ion-icon name="scan-outline"></ion-icon>
+          <span>Find the Device ID on the sticker attached to your CrashDetect hardware.</span>
+        </div>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="hardware-chip-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="user.deviceId" name="deviceId" placeholder="Device Serial ID"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="sim-outline" slot="start"></ion-icon>
+          <ion-input type="tel" [(ngModel)]="user.simNumber" name="simNumber"
+            placeholder="Device SIM Number"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-label danger">EMERGENCY CONTACT</h3>
+
+        <ion-item lines="none" class="custom-input emergency-focus">
+          <ion-icon name="medkit-outline" slot="start" color="danger"></ion-icon>
+          <ion-input type="tel" [(ngModel)]="user.emergencyNumber" name="emergencyNumber"
+            placeholder="Emergency Phone Number"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="action-area">
+        <ion-button expand="block" type="submit" class="main-btn">
+          COMPLETE REGISTRATION
+        </ion-button>
+      </div>
+
+    </form>
+  </div>
+</ion-content>
+
+<style>
+  .register-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+  }
+
+  .header-text {
+    margin-bottom: 30px;
+  }
+
+  .header-text h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .form-section {
+    margin-bottom: 30px;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--c-text-3);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-left: 4px;
+  }
+
+  .section-label.danger {
+    color: var(--c-danger);
+  }
+
+  .info-card {
+    background: #eff6ff;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid #dbeafe;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #1e40af;
+    line-height: 1.5;
+  }
+
+  .info-card ion-icon {
+    font-size: 20px;
+    margin-right: 12px;
+    min-width: 20px;
+  }
+
+  .emergency-focus {
+    --background: #fef2f2;
+    /* Light Red */
+    border: 1px solid #fecaca;
+  }
+
+  .emergency-focus ion-input {
+    color: #b91c1c;
+    font-weight: 700;
+  }
+
+  .action-area {
+    margin-top: 40px;
+  }
+</style>

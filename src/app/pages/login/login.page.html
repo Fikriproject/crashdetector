@@ -1,0 +1,267 @@
+<ion-content>
+  <div class="split-layout">
+    <!-- Top Visual Area -->
+    <div class="visual-area">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+
+      <div class="brand-container">
+        <div class="logo-box">
+          <ion-icon name="shield-checkmark"></ion-icon>
+        </div>
+        <h1>CrashDetect</h1>
+        <p>Your Safety Guardian</p>
+      </div>
+    </div>
+
+    <!-- Bottom Form Area -->
+    <div class="form-area">
+      <div class="form-card">
+
+        <!-- Toggle Switch -->
+        <div class="login-toggle">
+          <div class="toggle-bg"></div>
+          <button class="toggle-btn" [class.active]="loginType === 'user'" (click)="setLoginType('user')">
+            User
+          </button>
+          <button class="toggle-btn" [class.active]="loginType === 'emergency'" (click)="setLoginType('emergency')">
+            Emergency
+          </button>
+        </div>
+
+        <div class="input-group">
+          <!-- User Login -->
+          <div *ngIf="loginType === 'user'" class="fade-in">
+            <ion-item lines="none" class="custom-input">
+              <ion-icon name="phone-portrait-outline" slot="start"></ion-icon>
+              <ion-label position="stacked">PHONE NUMBER</ion-label>
+              <ion-input type="tel" [(ngModel)]="phone"></ion-input>
+            </ion-item>
+
+            <ion-item lines="none" class="custom-input">
+              <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+              <ion-label position="stacked">PASSWORD</ion-label>
+              <ion-input type="password" [(ngModel)]="password"></ion-input>
+            </ion-item>
+
+            <div class="actions">
+              <ion-button expand="block" class="main-btn" (click)="onLogin()">
+                SIGN IN
+                <ion-icon name="arrow-forward" slot="end"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- Emergency Login -->
+          <div *ngIf="loginType === 'emergency'" class="fade-in">
+            <div class="alert-box">
+              <ion-icon name="medkit"></ion-icon>
+              <p>Quick access for emergency contacts to locate family members.</p>
+            </div>
+
+            <ion-item lines="none" class="custom-input emergency-input">
+              <ion-icon name="call" slot="start"></ion-icon>
+              <ion-label position="stacked">EMERGENCY NUMBER</ion-label>
+              <ion-input type="tel" [(ngModel)]="emergencyPhone"></ion-input>
+            </ion-item>
+
+            <div class="actions">
+              <ion-button expand="block" class="main-btn danger" (click)="onEmergencyLogin()">
+                ACCESS NOW
+              </ion-button>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>Don't have an account? <span (click)="goToRegister()">Sign Up</span></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<style>
+  .split-layout {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+  }
+
+  .visual-area {
+    flex: 0.8;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+  }
+
+  /* Animated Blobs */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.4;
+  }
+
+  .blob-1 {
+    width: 200px;
+    height: 200px;
+    background: #60a5fa;
+    top: -50px;
+    left: -50px;
+    animation: move 8s infinite alternate;
+  }
+
+  .blob-2 {
+    width: 250px;
+    height: 250px;
+    background: #2563eb;
+    bottom: -80px;
+    right: -80px;
+    animation: move 10s infinite alternate-reverse;
+  }
+
+  @keyframes move {
+    from {
+      transform: translate(0, 0);
+    }
+
+    to {
+      transform: translate(20px, 30px);
+    }
+  }
+
+  .brand-container {
+    text-align: center;
+    color: white;
+    z-index: 10;
+  }
+
+  .logo-box {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .brand-container h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: white;
+  }
+
+  .brand-container p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .form-area {
+    flex: 1.2;
+    padding: 30px;
+    margin-top: -30px;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 30px;
+    padding: 10px;
+  }
+
+  /* Toggle */
+  .login-toggle {
+    background: #f1f5f9;
+    border-radius: 16px;
+    padding: 4px;
+    display: flex;
+    margin-bottom: 30px;
+    position: relative;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    color: #64748b;
+    z-index: 2;
+    transition: color 0.3s;
+  }
+
+  .toggle-btn.active {
+    color: #0f172a;
+  }
+
+  /* Need JS to animate properly or simple CSS logic */
+  .toggle-btn.active {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .alert-box {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    color: #b91c1c;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .alert-box ion-icon {
+    font-size: 24px;
+    margin-right: 12px;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  .footer span {
+    color: var(--c-primary);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

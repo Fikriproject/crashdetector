@@ -1,0 +1,179 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard" text="" icon="chevron-back" color="dark"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Edit Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="content-wrapper">
+
+    <!-- Profile Image -->
+    <div class="profile-avatar-section">
+      <div class="avatar-container">
+        <img src="https://ui-avatars.com/api/?name={{ user.name || 'U' }}&background=2563eb&color=fff&size=256"
+          alt="Avatar">
+        <div class="edit-btn">
+          <ion-icon name="camera"></ion-icon>
+        </div>
+      </div>
+      <h2>{{ user.name || 'Your Name' }}</h2>
+      <p>{{ user.phone }}</p>
+    </div>
+
+    <form (ngSubmit)="saveProfile()">
+
+      <div class="form-group">
+        <label class="group-label">ACCOUNT SECURITY</label>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="user.name" name="name" placeholder="Full Name"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="user.password" name="password" type="password" placeholder="Password"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label">HARDWARE</label>
+
+        <ion-item lines="none" class="custom-input disabled">
+          <ion-icon name="hardware-chip-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="user.deviceId" name="deviceId" readonly></ion-input>
+          <ion-icon name="lock-closed" slot="end" class="lock-icon"></ion-icon>
+        </ion-item>
+
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="sim-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="user.simNumber" name="simNumber" type="tel"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-group">
+        <label class="group-label danger">EMERGENCY CONTACT</label>
+
+        <div class="warning-box">
+          This number will be contacted during an accident.
+        </div>
+
+        <ion-item lines="none" class="custom-input danger-input">
+          <ion-icon name="medkit-outline" slot="start" color="danger"></ion-icon>
+          <ion-input [(ngModel)]="user.emergencyNumber" name="emergencyNumber" type="tel"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="action-footer">
+        <ion-button expand="block" type="submit" class="main-btn">
+          SAVE CHANGES
+        </ion-button>
+      </div>
+
+    </form>
+  </div>
+</ion-content>
+
+<style>
+  .content-wrapper {
+    padding: 24px;
+  }
+
+  /* Avatar */
+  .profile-avatar-section {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .avatar-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    position: relative;
+    padding: 4px;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .avatar-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .edit-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--c-primary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 3px solid white;
+    font-size: 16px;
+  }
+
+  .profile-avatar-section h2 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  /* Form */
+  .form-group {
+    margin-bottom: 30px;
+  }
+
+  .group-label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--c-text-3);
+    letter-spacing: 1px;
+    padding-left: 4px;
+  }
+
+  .group-label.danger {
+    color: var(--c-danger);
+  }
+
+  .disabled {
+    opacity: 0.7;
+    background: #e2e8f0;
+  }
+
+  .lock-icon {
+    font-size: 14px;
+    opacity: 0.5;
+  }
+
+  .warning-box {
+    font-size: 12px;
+    color: var(--c-danger);
+    background: #fef2f2;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--c-danger);
+  }
+
+  .danger-input {
+    border: 1px solid #fecaca;
+    --background: #fff1f2;
+  }
+
+  .danger-input ion-input {
+    color: var(--c-danger);
+    font-weight: 700;
+  }
+</style>

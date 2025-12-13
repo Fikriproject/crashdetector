@@ -1,37 +1,151 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
+/* Global CSS */
 
-/* Core CSS required for Ionic components to work properly */
-@import "@ionic/angular/css/core.css";
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-/* Basic CSS for apps built with Ionic */
-@import "@ionic/angular/css/normalize.css";
-@import "@ionic/angular/css/structure.css";
-@import "@ionic/angular/css/typography.css";
-@import "@ionic/angular/css/display.css";
+:root {
+  --ion-font-family: 'Plus Jakarta Sans', sans-serif;
 
-/* Optional CSS utils that can be commented out */
-@import "@ionic/angular/css/padding.css";
-@import "@ionic/angular/css/float-elements.css";
-@import "@ionic/angular/css/text-alignment.css";
-@import "@ionic/angular/css/text-transformation.css";
-@import "@ionic/angular/css/flex-utils.css";
+  /* Color Palette - Premium Soft UI */
+  --c-primary: #2563eb;
+  /* Royal Blue */
+  --c-primary-light: #eff6ff;
+  --c-secondary: #64748b;
+  /* Slate */
+  --c-background: #f8fafc;
+  /* Very Light Blue-Grey */
+  --c-surface: #ffffff;
+  --c-danger: #ef4444;
+  --c-success: #10b981;
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+  --c-text-1: #0f172a;
+  /* Deep Blue Black */
+  --c-text-2: #475569;
+  /* Muted Blue Grey */
+  --c-text-3: #94a3b8;
+  /* Light Grey */
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+  /* UI Variables */
+  --radius-xl: 28px;
+  --radius-l: 20px;
+  --radius-m: 16px;
+  --radius-s: 12px;
+
+  --shadow-soft: 0 10px 40px -10px rgba(148, 163, 184, 0.15);
+  --shadow-hover: 0 20px 40px -10px rgba(148, 163, 184, 0.25);
+}
+
+body {
+  background-color: var(--c-background);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+ion-content {
+  --background: var(--c-background);
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--c-text-1);
+  margin: 0;
+  line-height: 1.2;
+}
+
+p {
+  color: var(--c-text-2);
+  line-height: 1.6;
+}
+
+/* Premium Card */
+.premium-card {
+  background: var(--c-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.premium-card:active {
+  transform: scale(0.98);
+}
+
+/* Clean Inputs */
+ion-item.custom-input {
+  --background: #f1f5f9;
+  --border-radius: var(--radius-m);
+  --padding-start: 20px;
+  --inner-padding-end: 20px;
+  --min-height: 60px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  --highlight-height: 0;
+  transition: all 0.2s ease;
+}
+
+ion-item.custom-input.has-focus {
+  --background: #ffffff;
+  box-shadow: 0 0 0 2px var(--c-primary);
+}
+
+ion-item.custom-input ion-icon {
+  color: var(--c-text-3);
+  margin-right: 12px;
+}
+
+ion-item.custom-input ion-input {
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  font-weight: 600;
+  color: var(--c-text-1);
+}
+
+ion-item.custom-input ion-label {
+  color: var(--c-text-3) !important;
+  font-weight: 600;
+  font-size: 12px !important;
+  letter-spacing: 0.5px;
+}
+
+/* Modern Button */
+.main-btn {
+  --background: var(--c-primary);
+  --border-radius: var(--radius-l);
+  --box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+  height: 58px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  --padding-start: 32px;
+  --padding-end: 32px;
+}
+
+.main-btn.danger {
+  --background: var(--c-danger);
+  --box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4);
+}
+
+/* Header Reset */
+ion-header {
+  background: transparent;
+}
+
+ion-toolbar {
+  --background: transparent;
+  --border-width: 0;
+}
+
+ion-title {
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--c-text-1);
+  padding-inline: 20px;
+}

@@ -1,0 +1,28 @@
+- Generating browser application bundles (phase: setup)...
+Γ£ö Browser application bundle generation complete.
+Γ£ö Browser application bundle generation complete.
+
+Warning: C:\Users\ACER\Documents\Crash\accident-detector\node_modules\ngx-mqtt\fesm2022\ngx-mqtt.mjs depends on 'mqtt-browser'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+
+Error: src/app/pages/dashboard/dashboard.module.ts:18:18 - error NG6008: Component DashboardPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+18   declarations: [DashboardPage]
+                    ~~~~~~~~~~~~~
+
+
+Error: src/app/pages/login/login.module.ts:18:18 - error NG6008: Component LoginPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+18   declarations: [LoginPage]
+                    ~~~~~~~~~
+
+
+Error: src/app/pages/register/register.module.ts:18:18 - error NG6008: Component RegisterPage is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?
+
+18   declarations: [RegisterPage]
+                    ~~~~~~~~~~~~
+
+
+
