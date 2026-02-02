@@ -1,0 +1,93 @@
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Montserrat', sans-serif;
+  font-optical-sizing: auto;
+}
+
+/* Hide scroll bar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Allow scroll */
+body {
+  overflow: scroll;
+}
+
+/* SweetAlert2 Styling */
+/* Styling untuk SweetAlert2 */
+.swal2-popup {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  border-radius: 24px;
+  color: #333;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .swal2-popup {
+  background: #1f1f1f;
+  color: #fff;
+  border: 1px solid #333;
+}
+
+.swal2-title {
+  color: inherit;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.swal2-confirm {
+  background-color: #202938;
+  color: #fff;
+}
+
+.dark-mode .swal2-confirm {
+  background-color: #ef4444;
+}
+
+/* Backdrop filter with Soft Blur */
+.swal2-backdrop-show {
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Transitions */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode {
+  background-color: rgb(29, 29, 29);
+  color: #FFFFFF;
+}
+
+.dark-mode .bg-b {
+  background-color: #1f1f1f;
+}
+
+.dark-mode .bg-gray-200 {
+  background-color: #333;
+}
+
+.dark-mode .text-gray-800 {
+  color: #FFFFFF;
+}
+
+/* Icon Transition */
+.icon-transition {
+  transition: color 0.3s ease;
+}

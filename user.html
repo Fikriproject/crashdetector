@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>User Profile - CRASH DETEKTOR</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CDN Links -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    fontFamily: {
+                        montserrat: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style/style.css" />
+</head>
+
+<body
+    class="max-w-screen-lg mx-auto flex flex-col min-h-screen text-gray-700 bg-gray-50 dark:bg-[#1d1d1d] dark:text-white transition-colors duration-300">
+
+    <!-- HEADER -->
+    <div class="mt-2 md:mt-5 mx-6 flex items-start justify-between">
+        <div class="text-center">
+            <a href="dashboard.html"
+                class="fa fa-arrow-left text-3xl cursor-pointer hover:text-gray-900 dark:hover:text-gray-300 transition-colors"></a>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <span class="text-2xl font-extrabold tracking-widest text-gray-800 dark:text-white">USER PROFILE</span>
+        </div>
+
+        <i id="dark-mode-toggle"
+            class="fa fa-moon text-3xl cursor-pointer icon-transition hover:text-gray-900 dark:hover:text-gray-300"></i>
+    </div>
+    <div class="text-xs font-semibold flex items-center justify-center text-gray-400 mb-6 mt-4">By FIKRI ALI</div>
+
+    <!-- PROFILE CARD -->
+    <div class="mx-6 mb-6 flex-1 flex flex-col items-center justify-center">
+        <div
+            class="w-full max-w-4xl bg-white dark:bg-[#252525] rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 p-8 transition-all duration-300">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- LEFT COLUMN: Profile Info -->
+                <div class="flex flex-col text-center md:text-left">
+                    <div class="flex flex-col items-center md:items-start">
+                        <div class="relative w-24 h-24 mb-4">
+                            <div
+                                class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-4 border-white dark:border-[#333] shadow-md">
+                                <i class="fa fa-user text-4xl text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <div
+                                class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-2 border-white dark:border-[#333] rounded-full">
+                            </div>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-1">Fikri Ali</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-6">Administrator</p>
+                    </div>
+
+                    <div class="space-y-4 w-full">
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-[#333]">
+                            <span class="text-xs font-bold text-gray-400 uppercase">ID</span>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">#USER-8821</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-[#333]">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Email</span>
+                            <span
+                                class="text-sm font-semibold text-gray-700 dark:text-gray-200">fikri@example.com</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-[#333]">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Phone</span>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">+62
+                                812-3456-7890</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-8">
+                        <button onclick="window.location.href='index.html'"
+                            class="w-full py-3 rounded-xl bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold text-xs uppercase hover:bg-red-200 dark:hover:bg-red-900/40 transition-colors">
+                            <i class="fa fa-sign-out-alt mr-2"></i> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Emergency Contacts -->
+                <div
+                    class="border-t md:border-t-0 md:border-l border-gray-100 dark:border-gray-700 pt-8 md:pt-0 md:pl-8">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 text-center md:text-left">
+                        Emergency Contacts</h3>
+
+                    <form onsubmit="saveContacts(event)" class="space-y-4">
+                        <!-- Contact 1 -->
+                        <div
+                            class="p-4 rounded-2xl bg-gray-50 dark:bg-[#333] border border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-phone-alt text-xs text-red-500"></i>
+                                <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Contact 1</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" placeholder="Name"
+                                    class="w-full bg-transparent border-b border-gray-200 dark:border-gray-600 text-sm py-1 focus:outline-none focus:border-red-500 transition-colors"
+                                    value="Ayah">
+                                <input type="tel" placeholder="Phone"
+                                    class="w-full bg-transparent border-b border-gray-200 dark:border-gray-600 text-sm py-1 focus:outline-none focus:border-red-500 transition-colors"
+                                    value="08123456789">
+                            </div>
+                        </div>
+
+                        <!-- Contact 2 -->
+                        <div
+                            class="p-4 rounded-2xl bg-gray-50 dark:bg-[#333] border border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-phone-alt text-xs text-red-500"></i>
+                                <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Contact 2</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" placeholder="Name"
+                                    class="w-full bg-transparent border-b border-gray-200 dark:border-gray-600 text-sm py-1 focus:outline-none focus:border-red-500 transition-colors">
+                                <input type="tel" placeholder="Phone"
+                                    class="w-full bg-transparent border-b border-gray-200 dark:border-gray-600 text-sm py-1 focus:outline-none focus:border-red-500 transition-colors">
+                            </div>
+                        </div>
+
+                        <!-- Contact 3 -->
+                        <div
+                            class="p-4 rounded-2xl bg-gray-50 dark:bg-[#333] border border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-phone-alt text-xs text-red-500"></i>
+                                <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Contact 3</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" placeholder="Name"
+                                    class="w-full bg-transparent border-b border-gray-200 dark:border-gray-600 text-sm py-1 focus:outline-none focus:border-red-500 transition-colors">
+                                <input type="tel" placeholder="Phone"
+                                    class="w-full bg-transparent border-b border-gray-200 dark:border-gray-600 text-sm py-1 focus:outline-none focus:border-red-500 transition-colors">
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase shadow-lg shadow-blue-500/30 hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all">
+                            Save Contacts
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Theme Logic (Copied from dashboard)
+        const toggleButton = document.getElementById('dark-mode-toggle');
+        const bodyCurrent = document.documentElement;
+
+        function applyTheme(isDark) {
+            if (isDark) {
+                bodyCurrent.classList.add('dark');
+                document.body.classList.add('dark-mode');
+                toggleButton.classList.remove('fa-moon');
+                toggleButton.classList.add('fa-sun');
+            } else {
+                bodyCurrent.classList.remove('dark');
+                document.body.classList.remove('dark-mode');
+                toggleButton.classList.remove('fa-sun');
+                toggleButton.classList.add('fa-moon');
+            }
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            applyTheme(true);
+        }
+
+        toggleButton.addEventListener('click', () => {
+            const isDark = !bodyCurrent.classList.contains('dark');
+            applyTheme(isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        function saveContacts(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'SAVED',
+                text: 'Emergency contacts have been updated.',
+                showConfirmButton: false,
+                timer: 1500,
+                background: document.documentElement.classList.contains('dark') ? '#1f1f1f' : '#fff',
+                color: document.documentElement.classList.contains('dark') ? '#fff' : '#333'
+            });
+        }
+    </script>
+</body>
+
+</html>
