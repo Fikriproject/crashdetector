@@ -188,18 +188,7 @@
         text.className = "text-lg font-extrabold text-red-700 dark:text-red-300";
         text.innerText = "KECELAKAAN!";
         label.className = "text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-widest";
-
-        // SweetAlert Warning
-        Swal.fire({
-          icon: 'warning',
-          title: 'KECELAKAAN TERDETEKSI!',
-          text: 'Segera periksa kondisi perangkat!',
-          timer: 3000,
-          showConfirmButton: false,
-          background: document.documentElement.classList.contains('dark') ? '#1f1f1f' : '#fff',
-          color: document.documentElement.classList.contains('dark') ? '#fff' : '#333'
-        });
-
+        // HAPUS SWAL.FIRE DI SINI AGAR TIDAK TABRAKAN
       } else {
         // Safe State
         badge.className = "flex items-center justify-center gap-3 bg-green-100 dark:bg-green-900/30 p-4 rounded-2xl shadow-sm border border-green-200 dark:border-green-800 transition-all duration-300";
@@ -213,6 +202,10 @@
 
     // Variabel Timer untuk monitoring data
     let connectionTimeout;
+
+    // Variabel Global Lokasi untuk Emergency Link
+    let globalLat = -6.200000;
+    let globalLong = 106.816666;
 
     const client = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
       clientId: "web_" + Math.random().toString(16).substr(2, 8),
@@ -323,17 +316,30 @@
           // -----------------------------------
         }
 
-        // Update Status Warna/Alert jika CRASH (Status tetap diproses walau data numeric invalid, untuk safety)
         if (data.status) {
-          updateCrashStatus(data.status);
+          updateCrashStatus(data.status); // Update warna UI
 
           if (data.status === "CRASH") {
-            Swal.fire({
-              title: 'KECELAKAAN TERDETEKSI!',
-              text: 'Lokasi dan kondisi pengendara bahaya.',
-              icon: 'warning',
-              confirmButtonText: 'OK'
-            });
+            // Gunakan pengecekan Swal.isVisible agar popup tidak muncul berulang-ulang
+            if (!Swal.isVisible()) {
+              Swal.fire({
+                title: 'KECELAKAAN TERDETEKSI!',
+                text: 'Sistem mendeteksi benturan ekstrem. Klik tombol di bawah untuk langkah penanganan.',
+                icon: 'warning',
+                showConfirmButton: true, // WAJIB TRUE
+                confirmButtonText: 'LAKUKAN PENANGANAN',
+                confirmButtonColor: '#d33',
+                allowOutsideClick: false,
+                // HAPUS properti timer: 3000 jika ada
+                background: document.documentElement.classList.contains('dark') ? '#1f1f1f' : '#fff',
+                color: document.documentElement.classList.contains('dark') ? '#fff' : '#333'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // Panggil fungsi penanganan setelah tombol diklik
+                  showEmergencyProtocol();
+                }
+              });
+            }
           }
         }
 
@@ -341,6 +347,61 @@
         console.error("Gagal parsing JSON:", e);
       }
     });
+
+    // --- PROTOKOL PENANGANAN KECELAKAAN ---
+    function showEmergencyProtocol() {
+      const lat = globalLat;
+      const lng = globalLong;
+
+      // Link Google Maps untuk mencari instansi terdekat
+      const mapsHospital = `https://www.google.com/maps/search/Rumah+Sakit/@${lat},${lng},15z`;
+      const mapsPolice = `https://www.google.com/maps/search/Kantor+Polisi/@${lat},${lng},15z`;
+
+      const emergencyCall = "tel:112";
+      const familyCall = "tel:081234567890"; // Ganti dengan nomor asli
+
+      Swal.fire({
+        title: '<span class="text-red-600 font-bold uppercase">Protokol Penanganan Darurat</span>',
+        html: `
+            <div class="text-left text-sm space-y-4">
+                <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <strong class="text-yellow-700 dark:text-yellow-400 block mb-1">1. JANGAN PANIK</strong>
+                    <p class="text-gray-600 dark:text-gray-300">Tarik napas dalam-dalam dan pastikan lingkungan sekitar aman sebelum menolong.</p>
+                </div>
+
+                <div class="space-y-2">
+                    <strong class="text-gray-800 dark:text-white">2. HUBUNGI KONTAK DARURAT</strong>
+                    <div class="flex gap-2">
+                        <a href="${familyCall}" class="flex-1 text-center py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700"><i class="fas fa-phone"></i> Keluarga</a>
+                        <a href="${emergencyCall}" class="flex-1 text-center py-2 bg-orange-600 text-white rounded-lg text-xs font-bold hover:bg-orange-700"><i class="fas fa-ambulance"></i> Medis 112</a>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-gray-100 dark:bg-white/5 rounded-lg">
+                    <strong class="text-gray-700 dark:text-gray-300 block mb-1 text-xs uppercase">Lokasi Terkini:</strong>
+                    <div class="font-mono text-[10px] text-blue-600 dark:text-blue-400 mb-3 underline">
+                        ${lat.toFixed(6)}, ${lng.toFixed(6)}
+                    </div>
+                    <strong class="text-gray-800 dark:text-white block mb-2">3. CARI INSTANSI TERDEKAT</strong>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="${mapsHospital}" target="_blank" class="p-3 bg-blue-500 text-white rounded-lg text-center hover:bg-blue-600">
+                            <i class="fas fa-hospital-alt mb-1"></i><br><span class="text-[9px]">RUMAH SAKIT</span>
+                        </a>
+                        <a href="${mapsPolice}" target="_blank" class="p-3 bg-slate-700 text-white rounded-lg text-center hover:bg-slate-800">
+                            <i class="fas fa-user-shield mb-1"></i><br><span class="text-[9px]">POLISI</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'SELESAI',
+        confirmButtonColor: '#10b981',
+        width: '450px',
+        background: document.documentElement.classList.contains('dark') ? '#1d1d1d' : '#fff',
+        color: document.documentElement.classList.contains('dark') ? '#fff' : '#333'
+      });
+    }
 
     // Location with Fallback
     function updateLocation(enableHighAccuracy = true) {
@@ -352,6 +413,10 @@
           async (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
+
+            // SIMPAN KE GLOBAL VAR
+            globalLat = latitude;
+            globalLong = longitude;
 
             try {
               // GANTI NOMINATIM DENGAN BigDataCloud (CORS Friendly)
