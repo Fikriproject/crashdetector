@@ -70,7 +70,7 @@
   <!-- SENSOR -->
   <div class="flex-1 flex flex-col justify-center mx-5 mb-10">
     <div class="grid grid-cols-2 gap-5">
-      <!-- Pitch -->
+      <!-- Pitch (Kemiringan Depan/Belakang) -->
       <div
         class="grid items-center text-center bg-gray-200 dark:bg-[#333] rounded-3xl py-8 shadow-sm hover:shadow-md transition-all">
         <i class="fas fa-plane-up fa-3x text-green-600 transform -rotate-12"></i>
@@ -78,10 +78,12 @@
           <span class="mr-1 text-3xl font-extrabold dark:text-white" id="sensor3">-</span>
           <span class="text-xl font-semibold dark:text-gray-300">°</span>
         </div>
-        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Pitch</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Kemiringan
+          Depan</span>
+        <div id="status-pitch" class="text-xs font-bold text-gray-400 dark:text-gray-500 italic">Menunggu Data...</div>
       </div>
 
-      <!-- Roll -->
+      <!-- Roll (Kemiringan Kiri/Kanan) -->
       <div
         class="grid items-center text-center bg-gray-200 dark:bg-[#333] rounded-3xl py-8 shadow-sm hover:shadow-md transition-all">
         <i class="fas fa-rotate fa-3x text-purple-600"></i>
@@ -89,7 +91,9 @@
           <span class="mr-1 text-3xl font-extrabold dark:text-white" id="sensor4">-</span>
           <span class="text-xl font-semibold dark:text-gray-300">°</span>
         </div>
-        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Roll</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Kemiringan
+          Samping</span>
+        <div id="status-roll" class="text-xs font-bold text-gray-400 dark:text-gray-500 italic">Menunggu Data...</div>
       </div>
     </div>
   </div>
@@ -100,9 +104,16 @@
     <span class="ml-2 text-center text-sm font-bold text-gray-600 dark:text-gray-300" id="location">Mendeteksi
       lokasi...</span>
   </div>
-  <div class="mb-10 mx-6 flex justify-center items-center mt-2 text-gray-400">
-    <span class="text-center text-xs">Last update :</span>
-    <span class="ml-1 text-center text-xs font-mono" id="timestamp">-</span>
+  <div class="mb-10 mx-6 flex flex-col justify-center items-center mt-2 text-gray-400 space-y-2">
+    <div class="flex items-center">
+      <span class="text-center text-xs">Last update :</span>
+      <span class="ml-1 text-center text-xs font-mono" id="timestamp">-</span>
+    </div>
+    <!-- DEBUG DISPLAY -->
+    <div class="bg-black/10 dark:bg-white/10 px-4 py-2 rounded-lg" id="debug-container">
+      <span id="debug-data" class="text-[10px] font-mono text-gray-500 dark:text-gray-400">Waiting for Raw
+        Data...</span>
+    </div>
   </div>
 
   <!-- MQTT & Logic -->
@@ -200,6 +211,9 @@
       }
     };
 
+    // Variabel Timer untuk monitoring data
+    let connectionTimeout;
+
     const client = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
       clientId: "web_" + Math.random().toString(16).substr(2, 8),
       clean: true,
@@ -208,7 +222,9 @@
     });
 
     client.on("connect", () => {
-      console.log("✅ Terhubung ke broker MQTT");
+      console.log("✅ Terhubung ke broker MQTT (Menunggu Data...)");
+      // KITA JANGAN LANGSUNG SET CONNECTED. TUNGGU DATA MASUK DULU.
+      // updateConnectionStatus('connected'); 
 
       // PERBAIKAN: Gunakan topik yang SAMA PERSIS dengan Arduino
       const topic = "proyek/skripsi/IMK-FIKRI";
@@ -219,10 +235,13 @@
       });
     });
 
-    client.on("message", (topic, message) => {
-      // FIX: Force Connected status when data arrives (Fail-safe)
-      updateConnectionStatus('connected');
+    // Add Error Handling
+    client.on("error", (error) => {
+      console.error("MQTT Error:", error);
+      updateConnectionStatus('disconnected');
+    });
 
+    client.on("message", (topic, message) => {
       try {
         const payload = message.toString();
         const data = JSON.parse(payload);
@@ -230,15 +249,81 @@
         // DEBUG: Lihat data yang masuk di Console Browser (Tekan F12)
         console.log("Data Masuk:", data);
 
-        // Update Pitch & Roll (Akan bergerak realtime sekarang)
-        const pitch = data.pitch !== undefined ? data.pitch : 0;
-        const roll = data.roll !== undefined ? data.roll : 0;
+        // 1. CEK APAKAH DATA VALID (Bisa dibaca angka)
+        const isDataValid = (data.pitch !== undefined && data.pitch !== null) &&
+          (data.roll !== undefined && data.roll !== null);
 
-        document.getElementById("sensor3").textContent = Number(pitch).toFixed(2);
-        document.getElementById("sensor4").textContent = Number(roll).toFixed(2);
-        document.getElementById("timestamp").textContent = new Date().toLocaleString();
+        if (isDataValid) {
+          // JIKA DATA TERBACA VALID:
+          // 1. Set Status CONNECTED (Hijau)
+          updateConnectionStatus('connected');
 
-        // Update Status Warna/Alert jika CRASH
+          // 2. Clear Timer sebelumnya
+          clearTimeout(connectionTimeout);
+
+          // 3. Pasang Timer baru: Jika 4 detik tidak ada data lagi, set DISCONNECTED
+          connectionTimeout = setTimeout(() => {
+            console.warn("⚠️ Data timeout (tidak ada data baru > 4 detik)");
+            updateConnectionStatus('disconnected');
+          }, 4000); // 4 detik toleransi
+
+          // Update Pitch & Roll (Akan bergerak realtime sekarang)
+          const pitch = parseFloat(data.pitch);
+          const roll = parseFloat(data.roll);
+
+          console.log(`Parsed Data -> Pitch: ${pitch}, Roll: ${roll}`);
+
+          // UPDATE DEBUG DISPLAY
+          document.getElementById("debug-data").textContent = `RAW: Pitch=${pitch} | Roll=${roll}`;
+
+          if (!isNaN(pitch)) document.getElementById("sensor3").textContent = pitch.toFixed(2);
+          if (!isNaN(roll)) document.getElementById("sensor4").textContent = roll.toFixed(2);
+          document.getElementById("timestamp").textContent = new Date().toLocaleString();
+
+          // --- NEW: Keterangan Status Text ---
+          const statusPitchEl = document.getElementById("status-pitch");
+          const statusRollEl = document.getElementById("status-roll");
+
+          let statusPitchText = "Motor Normal";
+          let statusRollText = "Motor Normal";
+          let pitchColor = "text-gray-400 dark:text-gray-500";
+          let rollColor = "text-gray-400 dark:text-gray-500";
+
+          // Logic Pitch (Jamping) - Threshold 15 degrees
+          if (pitch > 15) {
+            statusPitchText = "Motor Jamping Depan";
+            pitchColor = "text-orange-500 font-extrabold";
+          } else if (pitch < -15) {
+            statusPitchText = "Motor Jamping Belakang";
+            pitchColor = "text-orange-500 font-extrabold";
+          }
+
+          // Logic Roll (Miring) - Threshold 15 degrees
+          if (roll > 15) {
+            statusRollText = "Motor Miring Kanan";
+            rollColor = "text-orange-500 font-extrabold";
+          } else if (roll < -15) {
+            statusRollText = "Motor Miring Kiri";
+            rollColor = "text-orange-500 font-extrabold";
+          }
+
+          // Jika Kecelakaan detected by hardware
+          if (data.status === "CRASH") {
+            statusPitchText = "KECELAKAAN! " + statusPitchText;
+            statusRollText = "KECELAKAAN! " + statusRollText;
+            pitchColor = "text-red-600 dark:text-red-500 font-extrabold animate-pulse";
+            rollColor = "text-red-600 dark:text-red-500 font-extrabold animate-pulse";
+          }
+
+          statusPitchEl.textContent = statusPitchText;
+          statusPitchEl.className = "text-xs font-bold italic " + pitchColor;
+
+          statusRollEl.textContent = statusRollText;
+          statusRollEl.className = "text-xs font-bold italic " + rollColor;
+          // -----------------------------------
+        }
+
+        // Update Status Warna/Alert jika CRASH (Status tetap diproses walau data numeric invalid, untuk safety)
         if (data.status) {
           updateCrashStatus(data.status);
 
@@ -260,7 +345,8 @@
     // Location with Fallback
     function updateLocation(enableHighAccuracy = true) {
       if (navigator.geolocation) {
-        if (enableHighAccuracy) document.getElementById('location').textContent = "Mencari lokasi (GPS)...";
+        const locationEl = document.getElementById('location');
+        if (enableHighAccuracy) locationEl.textContent = "Mencari lokasi (GPS)...";
 
         navigator.geolocation.getCurrentPosition(
           async (position) => {
@@ -268,13 +354,18 @@
             const longitude = position.coords.longitude;
 
             try {
-              const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+              // GANTI NOMINATIM DENGAN BigDataCloud (CORS Friendly)
+              const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=id`);
               const data = await response.json();
-              let locationText = data.address?.city || data.address?.town || data.address?.village || data.address?.state || data.address?.country;
-              document.getElementById('location').textContent = locationText || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+
+              // BigDataCloud structure: city, locality, principalSubdivision
+              let locationText = data.city || data.locality || data.principalSubdivision || data.countryName;
+              locationEl.textContent = locationText || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+
             } catch (error) {
               console.error("Fetch error:", error);
-              document.getElementById('location').textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+              // Fallback to coordinates
+              locationEl.textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
             }
           },
           (error) => {
