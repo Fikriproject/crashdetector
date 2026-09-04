@@ -1,54 +1,25 @@
-# Sistem Pendeteksi Kecelakaan (CrashDetect)
+# IoT Accident Crash Detector System
 
-Project Ionic ini menampilkan data sensor MPU6050 (Pitch, Roll, Gyro) dari Microcontroller via MQTT dan mendeteksi kondisi kecelakaan.
+Sistem pendeteksi kecelakaan berbasis IoT terintegrasi dengan sensor MPU6050 (akselerometer & giroskop), modul GPS NEO-6M, RTC, MicroSD Logger, GSM/GPRS, dan Web Dashboard Monitoring real-time.
 
-## Fitur
-1. **Login & Register**: Pengguna dapat mendaftarkan perangkat mereka.
-2. **Dashboard Real-time**: Menampilkan data kemiringan dan status bahaya.
-3. **Emergency Link**: Kontak darurat dapat login menggunakan nomor HP mereka untuk memantau kondisi pengguna (tanpa password).
+## 🚀 Fitur Utama
+- **Deteksi Benturan Otomatis**: Algoritma kalkulasi ambang batas g-force & tilt angle menggunakan sensor MPU-6050.
+- **Geolokasi Presisi**: Pelacakan koordinat lintang & bujur secara real-time via modul GPS.
+- **Safe Mode & Watchdog Timer (WDT)**: Mencegah kegagalan sistem mikrokontroler dengan recovery otomatis.
+- **Web Dashboard & Emergency Alert**: Dashboard berbasis Web PHP & MySQL untuk pemantauan armada, visualisasi rute perjalanan, dan notifikasi darurat.
+- **Data Logging & Offline Backup**: Pencatatan log data telemetri ke kartu MicroSD jika jaringan GSM offline.
+- **RESTful API & Postman Collection**: Endpoint API untuk sinkronisasi telemetri hardware ke server.
 
-## Cara Menjalankan
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Jalankan di browser:
-   ```bash
-   ionic serve
-   ```
+## 📁 Struktur Folder
+- `/arduino`: Source code firmware mikrokontroler (ESP/Arduino) beserta unit test modul (MPU, GPS, RTC, SD Card, Buzzer, Safemode, WDT, Lead Time).
+- `/web`: Web application dashboard (PHP, JavaScript, CSS/Assets, REST API).
+- `db_schema.sql`: Skema database MySQL untuk sistem pemantauan kecelakaan.
+- `Uji_Fungsional_Crash_Detektor_Lengkap_V2.postman_collection.json`: File Postman untuk pengujian API secara menyeluruh.
 
-## Konfigurasi MQTT
-App ini dikonfigurasi menggunakan Broker Public `broker.emqx.io` pada port `8083` (WebSocket).
-Topik default: `device/{DEVICE_ID}/data`
+## 🛠️ Tech Stack
+- **Hardware/Firmware**: C/C++, Arduino IDE, ESP32 / Arduino, MPU-6050, GPS NEO-6M, SIM800L / GSM Modul.
+- **Backend & Web**: PHP, MySQL / MariaDB, JavaScript, CSS3, REST API.
+- **Tools**: Postman, Git.
 
-## Simulasi Data (Testing)
-Anda dapat mengirim data palsu menggunakan software MQTTX atau terminal untuk mengetes tampilan App.
-
-**Topik:** `device/DEVICE_001/data`
-**Payload (JSON):**
-```json
-{
-  "pitch": 45,
-  "roll": 10,
-  "gyro": "X:0.1 Y:0.2 Z:0.0",
-  "accident": false
-}
-```
-
-Untuk mengetes bahaya:
-```json
-{
-  "pitch": 80,
-  "roll": 10,
-  "gyro": "...",
-  "accident": true
-}
-```
-
-## Akun Demo Default
-- **User Login:**
-  - No HP: `08123456789`
-  - Password: `admin`
-  - Device ID: `DEVICE_001`
-- **Emergency Login (Link):**
-  - No Darurat: `08999999999`
+---
+Dikembangkan oleh **Muchamad Fikri Ali** ([@Fikriproject](https://github.com/Fikriproject))

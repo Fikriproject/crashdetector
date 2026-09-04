@@ -1,0 +1,895 @@
+{
+  "info": {
+    "name": "Uji Fungsional & Keandalan CRASH DETEKTOR (Lengkap v2)",
+    "description": "Kumpulan skenario pengujian lengkap dengan pembersihan session otomatis.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/iot_accident_system/web"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Uji Fungsional Web - Autentikasi",
+      "item": [
+        {
+          "name": "0. GET Logout (Clear Session)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Membersihkan session sebelumnya jika ada",
+                  "pm.test(\"Session cleared\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/logout.php"
+          }
+        },
+        {
+          "name": "1. GET Halaman Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);",
+                  "pm.collectionVariables.set(\"user_a_email\", \"usera_\" + Date.now() + \"@test.com\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/register.php"
+          }
+        },
+        {
+          "name": "2. POST Registrasi dengan Kredensial Baru (Positif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Registration successful\", function () { pm.expect(pm.response.text()).to.include(\"Registration successful\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "full_name",
+                  "value": "User Utama A"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_a_email}}"
+                },
+                {
+                  "key": "phone",
+                  "value": "08111111111"
+                },
+                {
+                  "key": "address",
+                  "value": "Bandung"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. POST Registrasi dengan Email Terdaftar (Negatif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Shows error Email already registered\", function () { pm.expect(pm.response.text()).to.include(\"Email already registered\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "full_name",
+                  "value": "User Copy"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_a_email}}"
+                },
+                {
+                  "key": "phone",
+                  "value": "08222"
+                },
+                {
+                  "key": "address",
+                  "value": "Jakarta"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. GET Halaman Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/index.php"
+          }
+        },
+        {
+          "name": "5. POST Login dengan Kredensial Salah (Negatif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Shows error Email atau Password salah\", function () { pm.expect(pm.response.text()).to.include(\"Email atau Password salah\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/index.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_a_email}}"
+                },
+                {
+                  "key": "password",
+                  "value": "SalahPassword"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. POST Login dengan Kredensial Valid (Positif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login successful message shown\", function () { pm.expect(pm.response.text()).to.include(\"Berhasil Login!\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/index.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_a_email}}"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Pengujian Penautan Alat Baru (Pairing)",
+      "item": [
+        {
+          "name": "1. GET Dashboard (Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);",
+                  "// Set unique device ID for this run",
+                  "pm.collectionVariables.set(\"device_id\", \"DEV_\" + Date.now());",
+                  "pm.collectionVariables.set(\"device_id_2\", \"DEV2_\" + Date.now());"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard.php"
+          }
+        },
+        {
+          "name": "2. POST Tambah Alat ID Tidak Terdaftar (Positif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 (redirect to profile)\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/dashboard.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "device_id",
+                  "value": "{{device_id}}"
+                },
+                {
+                  "key": "pair_device_first",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. GET Halaman Register (User B untuk Test Kepemilikan)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);",
+                  "pm.collectionVariables.set(\"user_b_email\", \"userb_\" + Date.now() + \"@test.com\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/register.php"
+          }
+        },
+        {
+          "name": "4. POST Register User B",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "full_name",
+                  "value": "User B"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_b_email}}"
+                },
+                {
+                  "key": "phone",
+                  "value": "082"
+                },
+                {
+                  "key": "address",
+                  "value": "Bdg"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. GET Logout User A",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/logout.php"
+          }
+        },
+        {
+          "name": "6. GET Login User B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/index.php"
+          }
+        },
+        {
+          "name": "7. POST Login User B",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/index.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_b_email}}"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. GET Dashboard User B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard.php"
+          }
+        },
+        {
+          "name": "9. POST Tambah Alat Milik Orang Lain (Negatif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Shows error sudah memiliki pemilik\", function () {",
+                  "    pm.expect(pm.response.text()).to.include(\"Alat ini sudah memiliki pemilik\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/dashboard.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "device_id",
+                  "value": "{{device_id}}"
+                },
+                {
+                  "key": "pair_device_first",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "10. GET Logout User B",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/logout.php"
+          }
+        },
+        {
+          "name": "11. GET Login User A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/index.php"
+          }
+        },
+        {
+          "name": "12. POST Login User A",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/index.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_a_email}}"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Pengujian Penerimaan & Sinkronisasi Payload JSON",
+      "item": [
+        {
+          "name": "1. POST Payload Normal (safe)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 Created\", function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/post_data.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_device\": \"{{device_id}}\",\n  \"lokasi\": {\n    \"latitude\": -6.2,\n    \"longitude\": 106.8,\n    \"speed\": 45.5,\n    \"altitude\": 12\n  },\n  \"nilai_sensor\": {\n    \"roll\": 5,\n    \"pitch\": 2,\n    \"yaw\": 180,\n    \"accel_total\": 9.8,\n    \"suhu\": 30.5\n  },\n  \"status\": \"safe\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. POST Payload Emergency (emergency)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 Created\", function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/post_data.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_device\": \"{{device_id}}\",\n  \"lokasi\": {\n    \"latitude\": -6.2,\n    \"longitude\": 106.8,\n    \"speed\": 0,\n    \"altitude\": 12\n  },\n  \"nilai_sensor\": {\n    \"roll\": 85,\n    \"pitch\": 10,\n    \"yaw\": 90,\n    \"accel_total\": 1.2,\n    \"suhu\": 30\n  },\n  \"status\": \"emergency\"\n}"
+            }
+          }
+        },
+        {
+          "name": "3. POST Payload Tidak Lengkap (Negatif)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400 Bad Request\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Message incomplete data\", function () { pm.expect(pm.response.json().message).to.eql(\"Incomplete data structure.\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/post_data.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_device\": \"{{device_id}}\",\n  \"lokasi\": {\n    \"latitude\": -6.2\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Pengujian Fitur Halaman Riwayat",
+      "item": [
+        {
+          "name": "1. GET Chart Data Riwayat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Has Chart Data\", function () { var jsonData = pm.response.json(); pm.expect(jsonData).to.have.property('labels'); pm.expect(jsonData).to.have.property('data'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/get_chart_data.php?device_id=all"
+          }
+        },
+        {
+          "name": "2. GET Halaman Riwayat UI",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/riwayat.php"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Pengujian Penautan Kontak Darurat (1 Menit)",
+      "item": [
+        {
+          "name": "1. GET Pairing Page (User A)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/pairing.php"
+          }
+        },
+        {
+          "name": "2. POST Generate Pairing Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const code = $('#pairing_code_input').val();",
+                  "pm.collectionVariables.set(\"pairing_code\", code);",
+                  "pm.test(\"Code successfully generated\", function () { pm.expect(code).to.have.lengthOf(6); });",
+                  "pm.test(\"Shows 1 minute validity message\", function () { pm.expect(pm.response.text()).to.include(\"Valid for 1 minute\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/pairing.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "generate_code",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. GET Logout User A",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/logout.php"
+          }
+        },
+        {
+          "name": "4. GET Login User B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/index.php"
+          }
+        },
+        {
+          "name": "5. POST Login User B",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/index.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "email",
+                  "value": "{{user_b_email}}"
+                },
+                {
+                  "key": "password",
+                  "value": "Password123!"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. GET Dashboard User B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const $ = cheerio.load(pm.response.text());",
+                  "const csrf = $('input[name=\"csrf_token\"]').val();",
+                  "pm.collectionVariables.set(\"csrf_token\", csrf);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dashboard.php"
+          }
+        },
+        {
+          "name": "7. POST Gunakan Kode Pairing",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 (redirect to profile)\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"No error message\", function () { pm.expect(pm.response.text()).to.not.include(\"Kode Pairing sudah kedaluwarsa\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/dashboard.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "csrf_token",
+                  "value": "{{csrf_token}}"
+                },
+                {
+                  "key": "device_id",
+                  "value": "{{pairing_code}}"
+                },
+                {
+                  "key": "pair_device_first",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Uji Keakuratan & Keandalan - Latensi Data",
+      "item": [
+        {
+          "name": "1. POST Latency Test (Live Streaming Data)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Response time is less than 200ms\", function () { pm.expect(pm.response.responseTime).to.be.below(200); });",
+                  "pm.test(\"Response time is less than 500ms\", function () { pm.expect(pm.response.responseTime).to.be.below(500); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/post_data.php",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_device\": \"{{device_id}}\",\n  \"lokasi\": {\n    \"latitude\": -6.205,\n    \"longitude\": 106.82,\n    \"speed\": 40,\n    \"altitude\": 10\n  },\n  \"nilai_sensor\": {\n    \"roll\": 5,\n    \"pitch\": -2,\n    \"yaw\": 90,\n    \"accel_total\": 9.8,\n    \"suhu\": 31\n  },\n  \"status\": \"safe\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
